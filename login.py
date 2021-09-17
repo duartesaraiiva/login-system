@@ -9,9 +9,16 @@ class Login():
             database = sqlite3.connect('database.db')
             self.create_database(database)
         username = input('Enter your username:\n> ')
-        if(self.check_if_username_exists(username, database) == False):
+        while(self.check_if_username_exists(username, database) == False):
             print('Username is not registred.')
-            return
+            want_register = input('Would you like to create an account? (yes or no)\n> ')
+            if(want_register == 'yes','y'):
+                self.create_user(username, database)
+                username = input('Enter your username:\n> ')
+            elif(want_register == 'no','n'):
+                username = input('Enter your username:\n> ')
+            else:
+                want_register = input('Would you like to create an account? (yes or no)\n> ')
         password = input('Enter your password:\n> ')
         while(self.check_password(username, password, database) == False):
             print('Invalid password.')
@@ -26,6 +33,7 @@ class Login():
         cursor = database.cursor()
         cursor.execute('SELECT username FROM users WHERE username = \'{}\''.format(username))
         check = cursor.fetchall()
+        cursor.close()
         if len(check)==0:
             return False
         else:
@@ -38,6 +46,17 @@ class Login():
             return True
         else:
             return False
+    def create_user(self, username, database):
+        cursor = database.cursor()
+        password = input('Choose your password\n> ')
+        confirm_password = input('Repeat your password\n> ')
+        while(password != confirm_password):
+            print('Passwords do not match. Try again.')
+            password = input('Choose your password:\n> ')
+            confirm_password = input('Repeat your password:\n> ')
+        cursor.execute('INSERT INTO users VALUES (\'{}\', \'{}\')'.format(username, password))
+        cursor.close()
+        print('User registred! Please log in.')
 
 
 
