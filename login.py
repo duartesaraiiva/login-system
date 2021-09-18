@@ -13,13 +13,13 @@ class Login():
         while(self.check_if_username_exists(username, database) == False):
             print('Username is not registred.')
             want_register = input('Would you like to create an account? (yes or no)\n> ')
-            if(want_register == 'yes','y'):
+            if(want_register == 'yes'):
                 self.create_user(username, database)
                 username = input('Enter your username:\n> ')
-            elif(want_register == 'no','n'):
+            elif(want_register == 'no'):
                 username = input('Enter your username:\n> ')
             else:
-                want_register = input('Would you like to create an account? (yes or no)\n> ')
+                username = input('Enter your username:\n> ')
         password = input('Enter your password:\n> ')
         while(self.check_password(username, password, database) == False):
             print('Invalid password.')
@@ -49,7 +49,7 @@ class Login():
             return False
     def create_user(self, username, database):
         cursor = database.cursor()
-        password = input('Choose your password\n> ')
+        password = input('Choose your password:\n> ')
         confirm_password = input('Repeat your password:\n> ')
         while(password != confirm_password):
             print('Passwords do not match. Try again.')
