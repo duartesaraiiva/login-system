@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import bcrypt
 
 class Login():
     def __init__(self):
@@ -42,19 +43,21 @@ class Login():
         cursor = database.cursor()
         cursor.execute('SELECT password FROM users WHERE username = \'{}\''.format(username))
         stored_password = cursor.fetchall()
-        if(stored_password[0][0] == password):
+        if(bcrypt.checkpw(password.encode('utf-8'), stored_password[0][0].encode('utf-8'))):
             return True
         else:
             return False
     def create_user(self, username, database):
         cursor = database.cursor()
         password = input('Choose your password\n> ')
-        confirm_password = input('Repeat your password\n> ')
+        confirm_password = input('Repeat your password:\n> ')
         while(password != confirm_password):
             print('Passwords do not match. Try again.')
             password = input('Choose your password:\n> ')
             confirm_password = input('Repeat your password:\n> ')
-        cursor.execute('INSERT INTO users VALUES (\'{}\', \'{}\')'.format(username, password))
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        cursor.execute('INSERT INTO users VALUES ("{}", "{}")'.format(username, hashed_password.decode('utf-8')))
+        database.commit()
         cursor.close()
         print('User registred! Please log in.')
 
